@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>三年一寸光 | 幼儿园成长纪念册</title>
   <meta name="description" content="按小班、中班、大班珍藏孩子在幼儿园的三年照片和视频。">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css">
   <style>
     :root {
       --paper: #fff8e9;
@@ -19,6 +22,7 @@
       --line: rgba(39, 52, 46, 0.16);
       --shadow: 0 22px 70px rgba(78, 57, 26, 0.18);
       --radius: 8px;
+      --font-display: "LXGW WenKai", "Kaiti SC", "STKaiti", "KaiTi", serif;
       color-scheme: light;
       font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
     }
@@ -143,7 +147,7 @@
     h1 {
       max-width: 9em;
       margin: 0;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: clamp(54px, 14vw, 128px);
       font-weight: 700;
       line-height: 0.96;
@@ -167,8 +171,7 @@
     }
 
     .action,
-    .tab,
-    .icon-button {
+    .tab {
       min-height: 44px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -195,15 +198,13 @@
     }
 
     .action:hover,
-    .tab:hover,
-    .icon-button:hover {
+    .tab:hover {
       transform: translateY(-2px);
       border-color: rgba(39, 52, 46, 0.28);
     }
 
     .action:focus-visible,
     .tab:focus-visible,
-    .icon-button:focus-visible,
     .photo-card:focus-visible,
     .video-card:focus-visible {
       outline: 3px solid rgba(123, 196, 209, 0.65);
@@ -276,7 +277,7 @@
 
     .daily-heading h2 {
       margin: 0;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: clamp(34px, 6vw, 62px);
       line-height: 1.05;
       letter-spacing: 0;
@@ -335,7 +336,7 @@
     .memory-cover-title {
       max-width: 5em;
       margin: 36px 0;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: clamp(42px, 7vw, 74px);
       font-weight: 700;
       line-height: 1.04;
@@ -415,7 +416,7 @@
       place-items: center;
       border: 2px solid rgba(39, 52, 46, 0.25);
       border-radius: 50%;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: 28px;
       transform: rotate(-6deg);
     }
@@ -471,7 +472,7 @@
     }
 
     .daily-copy b {
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: 24px;
       line-height: 1.2;
     }
@@ -552,7 +553,7 @@
 
     .year-title {
       margin: 14px 0 0;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: clamp(34px, 6vw, 64px);
       line-height: 1.08;
       letter-spacing: 0;
@@ -793,7 +794,7 @@
 
     .letter h2 {
       margin: 0;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: clamp(30px, 6vw, 54px);
       line-height: 1.12;
       letter-spacing: 0;
@@ -848,21 +849,6 @@
       color: rgba(255, 255, 255, 0.82);
       text-align: center;
       font-size: 14px;
-    }
-
-    .icon-button {
-      position: absolute;
-      top: -12px;
-      right: -12px;
-      display: grid;
-      place-items: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #fff;
-      color: var(--ink);
-      font-size: 24px;
-      line-height: 1;
     }
 
     .bottom-nav {
@@ -1040,7 +1026,7 @@
       place-items: center;
       border: 1px solid rgba(39, 52, 46, 0.22);
       border-radius: 50%;
-      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-family: var(--font-display);
       font-size: 24px;
     }
 
@@ -1320,9 +1306,8 @@
     </main>
   </div>
 
-  <div class="modal" id="mediaModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="媒体预览">
+  <div class="modal" id="mediaModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="媒体预览" tabindex="-1">
     <div class="modal-inner">
-      <button class="icon-button" type="button" id="closeModal" aria-label="关闭">×</button>
       <div id="modalSlot"></div>
       <div class="modal-caption" id="modalCaption"></div>
     </div>
@@ -1411,7 +1396,6 @@
     const modal = document.querySelector("#mediaModal");
     const modalSlot = document.querySelector("#modalSlot");
     const modalCaption = document.querySelector("#modalCaption");
-    const closeModal = document.querySelector("#closeModal");
     const dailyDate = document.querySelector("#dailyDate");
     const dailyPage = document.querySelector("#dailyPage");
 
@@ -1725,7 +1709,7 @@
       }
 
       modal.setAttribute("aria-hidden", "false");
-      closeModal.focus();
+      modal.focus({ preventScroll: true });
     });
 
     function hideModal() {
@@ -1734,7 +1718,6 @@
       modalSlot.innerHTML = "";
     }
 
-    closeModal.addEventListener("click", hideModal);
     modal.addEventListener("click", (event) => {
       if (event.target === modal) hideModal();
     });
