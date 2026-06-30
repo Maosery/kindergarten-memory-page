@@ -1,0 +1,1644 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>三年一寸光 | 幼儿园成长纪念册</title>
+  <meta name="description" content="按小班、中班、大班珍藏孩子在幼儿园的三年照片和视频。">
+  <style>
+    :root {
+      --paper: #fff8e9;
+      --paper-deep: #f7e3bd;
+      --ink: #27342e;
+      --muted: #68736b;
+      --leaf: #6aa96f;
+      --sky: #7bc4d1;
+      --sun: #efb84a;
+      --coral: #de7566;
+      --plum: #7f6a9a;
+      --line: rgba(39, 52, 46, 0.16);
+      --shadow: 0 22px 70px rgba(78, 57, 26, 0.18);
+      --radius: 8px;
+      color-scheme: light;
+      font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255, 248, 233, 0.88), rgba(255, 248, 233, 0.98)),
+        var(--paper);
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      align-items: end;
+      min-height: 84svh;
+      padding: 28px clamp(18px, 5vw, 70px) 56px;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      content: "";
+      background:
+        radial-gradient(circle at 18% 24%, rgba(123, 196, 209, 0.4), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(239, 184, 74, 0.32), transparent 22%),
+        linear-gradient(180deg, rgba(255, 248, 233, 0.12), rgba(255, 248, 233, 0.95) 86%);
+    }
+
+    .hero::after {
+      position: absolute;
+      right: clamp(22px, 9vw, 120px);
+      bottom: 34px;
+      width: min(31vw, 320px);
+      height: 10px;
+      content: "";
+      background: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 19px);
+      opacity: 0.24;
+      transform: rotate(-2deg);
+    }
+
+    .topbar {
+      position: absolute;
+      top: 18px;
+      left: clamp(18px, 5vw, 70px);
+      right: clamp(18px, 5vw, 70px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 13px;
+      color: rgba(39, 52, 46, 0.78);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 18px;
+      height: 18px;
+      background:
+        linear-gradient(90deg, transparent 7px, rgba(39, 52, 46, 0.72) 7px 9px, transparent 9px),
+        linear-gradient(var(--leaf), var(--leaf));
+      border-radius: 50% 50% 45% 45%;
+      box-shadow: 0 0 0 5px rgba(106, 169, 111, 0.18);
+    }
+
+    .hero-copy {
+      width: min(680px, 100%);
+      transform: translateY(8px);
+      animation: rise 700ms ease-out both;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-family: "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
+      font-size: 13px;
+    }
+
+    .kicker::before {
+      width: 34px;
+      height: 2px;
+      content: "";
+      background: var(--coral);
+    }
+
+    h1 {
+      max-width: 9em;
+      margin: 0;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: clamp(54px, 14vw, 128px);
+      font-weight: 700;
+      line-height: 0.96;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .hero-text {
+      max-width: 520px;
+      margin: 22px 0 0;
+      color: #4f5f55;
+      font-size: clamp(16px, 2.1vw, 21px);
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .action,
+    .tab,
+    .icon-button {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 9px 24px rgba(78, 57, 26, 0.08);
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 18px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .action.primary {
+      border-color: rgba(106, 169, 111, 0.28);
+      background: var(--leaf);
+      color: #fff;
+    }
+
+    .action:hover,
+    .tab:hover,
+    .icon-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(39, 52, 46, 0.28);
+    }
+
+    .action:focus-visible,
+    .tab:focus-visible,
+    .icon-button:focus-visible,
+    .photo-card:focus-visible,
+    .video-card:focus-visible {
+      outline: 3px solid rgba(123, 196, 209, 0.65);
+      outline-offset: 3px;
+    }
+
+    .growth-ruler {
+      position: fixed;
+      top: 50%;
+      left: clamp(10px, 2vw, 24px);
+      z-index: 20;
+      display: grid;
+      gap: 14px;
+      padding: 12px 8px;
+      border: 1px solid rgba(39, 52, 46, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 248, 233, 0.78);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 14px 40px rgba(78, 57, 26, 0.13);
+      transform: translateY(-50%);
+    }
+
+    .ruler-link {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .ruler-link::after {
+      position: absolute;
+      right: -8px;
+      width: 8px;
+      height: 1px;
+      content: "";
+      background: currentColor;
+      opacity: 0.45;
+    }
+
+    .ruler-link.is-active {
+      color: #fff;
+      background: var(--ink);
+    }
+
+    main {
+      position: relative;
+      padding: 0 clamp(16px, 5vw, 72px) 82px;
+    }
+
+    .daily-memory {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: clamp(48px, 8vw, 86px) 0 clamp(42px, 7vw, 72px);
+      scroll-margin-top: 20px;
+    }
+
+    .daily-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .daily-heading h2 {
+      margin: 0;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .daily-heading p {
+      max-width: 390px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    .memory-book {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.76fr) minmax(0, 1.4fr);
+      min-height: 500px;
+      border: 1px solid rgba(39, 52, 46, 0.17);
+      border-radius: var(--radius);
+      background: #fffdf6;
+      box-shadow: 0 28px 78px rgba(78, 57, 26, 0.2);
+      overflow: hidden;
+    }
+
+    .memory-cover {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      padding: clamp(28px, 5vw, 52px);
+      color: #27342e;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)),
+        #efc85e;
+      border-right: 1px solid rgba(39, 52, 46, 0.18);
+    }
+
+    .memory-cover::before {
+      position: absolute;
+      top: 0;
+      right: 16px;
+      bottom: 0;
+      width: 1px;
+      content: "";
+      background: rgba(39, 52, 46, 0.18);
+      box-shadow: 7px 0 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .memory-date {
+      font-family: "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .memory-cover-title {
+      max-width: 5em;
+      margin: 36px 0;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: clamp(42px, 7vw, 74px);
+      font-weight: 700;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .open-memory,
+    .next-memory {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      border: 1px solid rgba(39, 52, 46, 0.24);
+      border-radius: var(--radius);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .open-memory {
+      width: 100%;
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .next-memory {
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.84);
+      color: var(--ink);
+    }
+
+    .open-memory:hover,
+    .next-memory:hover {
+      transform: translateY(-2px);
+    }
+
+    .open-memory:focus-visible,
+    .next-memory:focus-visible,
+    .daily-media:focus-visible {
+      outline: 3px solid rgba(123, 196, 209, 0.72);
+      outline-offset: 3px;
+    }
+
+    .memory-page {
+      position: relative;
+      display: grid;
+      min-width: 0;
+      place-items: center;
+      padding: clamp(22px, 4vw, 44px);
+      background:
+        repeating-linear-gradient(180deg, transparent 0 31px, rgba(123, 196, 209, 0.16) 31px 32px),
+        #fffdf6;
+    }
+
+    .memory-page::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 28px;
+      width: 1px;
+      content: "";
+      background: rgba(222, 117, 102, 0.22);
+    }
+
+    .daily-placeholder {
+      width: min(360px, 82%);
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .daily-placeholder-mark {
+      display: grid;
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 18px;
+      place-items: center;
+      border: 2px solid rgba(39, 52, 46, 0.25);
+      border-radius: 50%;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: 28px;
+      transform: rotate(-6deg);
+    }
+
+    .daily-reveal {
+      width: min(610px, 100%);
+      animation: reveal-memory 520ms ease-out both;
+    }
+
+    .daily-media {
+      position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      padding: 0;
+      border: 10px solid #fff;
+      border-radius: var(--radius);
+      background: #e9d8b7;
+      box-shadow: 0 18px 46px rgba(78, 57, 26, 0.19);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .daily-media img,
+    .daily-media video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .daily-media > .play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .daily-copy {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .daily-copy b,
+    .daily-copy span {
+      display: block;
+    }
+
+    .daily-copy b {
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .daily-copy span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tabs-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      margin: 0 calc(clamp(16px, 5vw, 72px) * -1);
+      padding: 10px clamp(16px, 5vw, 72px);
+      border-block: 1px solid rgba(39, 52, 46, 0.09);
+      background: rgba(255, 248, 233, 0.84);
+      backdrop-filter: blur(14px);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .tab {
+      display: grid;
+      place-items: center;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .tab[aria-selected="true"] {
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .year-section {
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.55fr);
+      gap: clamp(24px, 5vw, 70px);
+      align-items: start;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: clamp(54px, 9vw, 96px) 0;
+      scroll-margin-top: 78px;
+    }
+
+    .year-section + .year-section {
+      border-top: 1px dashed rgba(39, 52, 46, 0.2);
+    }
+
+    .year-intro {
+      position: sticky;
+      top: 86px;
+    }
+
+    .year-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--coral);
+      font-weight: 900;
+    }
+
+    .year-label::before {
+      width: 12px;
+      height: 12px;
+      content: "";
+      background: currentColor;
+      border-radius: 50%;
+    }
+
+    .year-title {
+      margin: 14px 0 0;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .year-note {
+      margin: 18px 0 0;
+      color: #536359;
+      font-size: 17px;
+      line-height: 1.85;
+    }
+
+    .year-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .stat {
+      min-height: 76px;
+      padding: 12px;
+      border: 1px solid rgba(39, 52, 46, 0.12);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .stat b {
+      display: block;
+      color: var(--ink);
+      font-family: "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .media-block {
+      min-width: 0;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 0 14px;
+    }
+
+    .section-heading h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .section-heading span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .photo-card {
+      position: relative;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      cursor: zoom-in;
+      overflow: hidden;
+    }
+
+    .photo-card:nth-child(1),
+    .photo-card:nth-child(6) {
+      grid-column: span 3;
+    }
+
+    .photo-card:nth-child(2),
+    .photo-card:nth-child(3),
+    .photo-card:nth-child(4),
+    .photo-card:nth-child(5) {
+      grid-column: span 3;
+    }
+
+    .photo-frame {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border: 8px solid rgba(255, 255, 255, 0.86);
+      border-radius: var(--radius);
+      background: #ebd7af;
+      box-shadow: 0 14px 34px rgba(78, 57, 26, 0.16);
+    }
+
+    .photo-card:nth-child(1) .photo-frame {
+      aspect-ratio: 16 / 11;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(0.98) contrast(0.98);
+      transition: transform 420ms ease, filter 420ms ease;
+    }
+
+    .photo-card:hover img {
+      transform: scale(1.035);
+      filter: saturate(1.06) contrast(1.02);
+    }
+
+    .caption {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      color: #fff;
+      background: linear-gradient(90deg, rgba(39, 52, 46, 0.78), rgba(39, 52, 46, 0.28));
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .is-missing .photo-frame::after,
+    .video-card.is-missing::after,
+    .daily-media.is-missing::after {
+      position: absolute;
+      inset: 8px;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      border: 1px dashed rgba(39, 52, 46, 0.34);
+      border-radius: 6px;
+      color: rgba(39, 52, 46, 0.7);
+      background: rgba(255, 248, 233, 0.62);
+      content: "待放入素材";
+      font-weight: 800;
+    }
+
+    .video-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .video-card {
+      position: relative;
+      min-height: 230px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius);
+      background: #e9d8b7;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .video-card video {
+      width: 100%;
+      height: 100%;
+      min-height: 230px;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 420ms ease;
+    }
+
+    .video-card video.is-frame-ready {
+      opacity: 0.9;
+    }
+
+    .video-card:hover video {
+      transform: scale(1.035);
+    }
+
+    .video-info {
+      position: absolute;
+      inset: auto 12px 12px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      color: #fff;
+      background: rgba(39, 52, 46, 0.76);
+      text-align: left;
+    }
+
+    .video-info b {
+      display: block;
+      font-size: 15px;
+    }
+
+    .video-info span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12px;
+    }
+
+    .play {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--sun);
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .letter {
+      max-width: 900px;
+      margin: 0 auto 74px;
+      padding: clamp(30px, 6vw, 58px);
+      border: 1px solid rgba(39, 52, 46, 0.12);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, rgba(123, 196, 209, 0.18) 0 12px, transparent 12px),
+        rgba(255, 255, 255, 0.62);
+      box-shadow: 0 20px 58px rgba(78, 57, 26, 0.12);
+    }
+
+    .letter h2 {
+      margin: 0;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: clamp(30px, 6vw, 54px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .letter p {
+      margin: 18px 0 0;
+      color: #4f5f55;
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .footer {
+      padding: 0 clamp(16px, 5vw, 72px) 42px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(24, 30, 27, 0.82);
+    }
+
+    .modal[aria-hidden="false"] {
+      display: grid;
+    }
+
+    .modal-inner {
+      position: relative;
+      width: min(1080px, 100%);
+      max-height: 92svh;
+    }
+
+    .modal-media {
+      display: block;
+      width: 100%;
+      max-height: 86svh;
+      border-radius: var(--radius);
+      object-fit: contain;
+      background: #111;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.36);
+    }
+
+    .modal-caption {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.82);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .icon-button {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      left: 12px;
+      z-index: 25;
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(39, 52, 46, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 248, 233, 0.88);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 48px rgba(78, 57, 26, 0.18);
+    }
+
+    .bottom-nav a {
+      display: grid;
+      place-items: center;
+      min-height: 42px;
+      border-radius: var(--radius);
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .bottom-nav a.is-active {
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .daily-only {
+      display: flex;
+      min-height: 100svh;
+      flex-direction: column;
+    }
+
+    .only-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px clamp(18px, 5vw, 70px);
+      color: rgba(39, 52, 46, 0.78);
+      font-size: 13px;
+    }
+
+    .only-main {
+      display: grid;
+      width: 100%;
+      flex: 1;
+      place-items: center;
+      padding: 0 clamp(16px, 5vw, 72px) 34px;
+    }
+
+    .only-main .daily-memory {
+      width: 100%;
+      padding: 18px 0 42px;
+    }
+
+    .today-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      width: min(920px, 100%);
+      margin: 0 auto 20px;
+    }
+
+    .today-header h1 {
+      max-width: none;
+      margin: 7px 0 0;
+      font-size: clamp(38px, 6vw, 64px);
+      line-height: 1;
+    }
+
+    .today-header p {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .memory-stage {
+      display: grid;
+      width: 100%;
+      min-height: min(610px, calc(100svh - 175px));
+      place-items: center;
+    }
+
+    .daily-loading {
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .daily-loading span {
+      display: grid;
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 16px;
+      place-items: center;
+      border: 1px solid rgba(39, 52, 46, 0.22);
+      border-radius: 50%;
+      font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
+      font-size: 27px;
+      animation: loading-page 1.5s ease-in-out infinite;
+    }
+
+    .daily-loading p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .daily-only .daily-reveal {
+      width: min(920px, 100%);
+    }
+
+    .daily-only .daily-media {
+      aspect-ratio: 16 / 10;
+    }
+
+    .daily-only .daily-copy {
+      padding: 0 4px;
+    }
+
+    .open-memory:disabled {
+      cursor: default;
+      opacity: 0.82;
+      transform: none;
+    }
+
+    @keyframes loading-page {
+      50% {
+        color: var(--ink);
+        border-color: rgba(39, 52, 46, 0.48);
+        transform: rotate(5deg);
+      }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(8px);
+      }
+    }
+
+    @keyframes reveal-memory {
+      from {
+        opacity: 0;
+        transform: translateY(18px) rotate(-0.8deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotate(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .growth-ruler {
+        display: none;
+      }
+
+      .bottom-nav {
+        display: grid;
+      }
+
+      .year-section {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+
+      .year-intro {
+        position: static;
+      }
+
+      .hero {
+        min-height: 82svh;
+        padding-bottom: 44px;
+      }
+
+      .memory-book {
+        grid-template-columns: 1fr;
+      }
+
+      .memory-cover {
+        min-height: 340px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(39, 52, 46, 0.18);
+      }
+
+      .memory-cover::before {
+        inset: auto 0 14px;
+        width: auto;
+        height: 1px;
+        box-shadow: 0 7px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .memory-page {
+        min-height: 500px;
+      }
+
+      main {
+        padding-bottom: 92px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        background-size: 1150px auto;
+        background-position: center top;
+      }
+
+      .only-topbar {
+        padding: 18px 16px 8px;
+      }
+
+      .only-main {
+        padding: 0 12px 24px;
+      }
+
+      .only-main .daily-memory {
+        padding: 14px 0 24px;
+      }
+
+      .today-header {
+        display: block;
+        margin-bottom: 16px;
+      }
+
+      .today-header h1 {
+        font-size: 42px;
+      }
+
+      .today-header p {
+        margin-top: 9px;
+      }
+
+      .memory-stage {
+        min-height: 430px;
+      }
+
+      .daily-only .daily-media {
+        aspect-ratio: 4 / 3;
+        border-width: 6px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        font-size: 12px;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .daily-heading {
+        display: block;
+      }
+
+      .daily-heading p {
+        margin-top: 10px;
+        text-align: left;
+      }
+
+      .daily-copy {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .next-memory {
+        width: 100%;
+      }
+
+      .tabs-wrap {
+        display: none;
+      }
+
+      .year-section {
+        padding: 52px 0;
+        scroll-margin-top: 14px;
+      }
+
+      .year-stats,
+      .video-row {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .photo-card:nth-child(n) {
+        grid-column: span 1;
+      }
+
+      .photo-card:nth-child(1) {
+        grid-column: span 2;
+      }
+
+      .caption {
+        font-size: 12px;
+      }
+
+      .letter {
+        margin-bottom: 54px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page daily-only">
+    <header class="only-topbar" aria-label="页面信息">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span id="childNameTop">幼儿园成长纪念册</span></div>
+      <div id="albumYears">2023-2026</div>
+    </header>
+
+    <main class="only-main">
+      <section class="daily-memory" aria-label="今日回忆">
+        <header class="today-header">
+          <div>
+            <div class="memory-date" id="dailyDate">今日回忆</div>
+            <h1>今日回忆</h1>
+          </div>
+          <p>三年时光，每天重逢一刻。</p>
+        </header>
+        <div class="memory-stage" id="dailyPage" aria-live="polite">
+          <div class="daily-loading">
+            <span aria-hidden="true">忆</span>
+            <p>正在翻开今天这一页</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="mediaModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="媒体预览">
+    <div class="modal-inner">
+      <button class="icon-button" type="button" id="closeModal" aria-label="关闭">×</button>
+      <div id="modalSlot"></div>
+      <div class="modal-caption" id="modalCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    const fallbackImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+
+    const album = {
+      childName: "宝贝",
+      yearsText: "2023-2026",
+      grades: [
+        {
+          key: "small",
+          label: "小班",
+          time: "2023.09 - 2024.07",
+          title: "第一次松开手",
+          note: "那一年，书包比背影还大。哭过、笑过，也在老师和朋友的陪伴里，慢慢学会说“我可以”。",
+          stats: [
+            ["01", "第一次入园"],
+            ["36", "张想珍藏的照片"]
+          ],
+          photos: [
+            ["media/small/photo-01.jpg", "入园第一天"],
+            ["media/small/photo-02.jpg", "晨间游戏"],
+            ["media/small/photo-03.jpg", "第一次做手工"],
+            ["media/small/photo-04.jpg", "小小运动员"],
+            ["media/small/photo-05.jpg", "午后的故事"],
+            ["media/small/photo-06.jpg", "和朋友在一起"]
+          ],
+          videos: [
+            ["media/videos/small-01.mp4", "第一次上台", 2.5],
+            ["media/videos/small-02.mp4", "快乐早操", 2.5]
+          ]
+        },
+        {
+          key: "middle",
+          label: "中班",
+          time: "2024.09 - 2025.07",
+          title: "把世界画大一点",
+          note: "那一年，你开始有自己的主意。画里有太阳，游戏里有规则，朋友的名字也被认真放进每天的故事。",
+          stats: [
+            ["02", "第二年成长"],
+            ["48", "个闪光瞬间"]
+          ],
+          photos: [
+            ["media/middle/photo-01.jpg", "秋游路上"],
+            ["media/middle/photo-02.jpg", "画一片天空"],
+            ["media/middle/photo-03.jpg", "阅读角"],
+            ["media/middle/photo-04.jpg", "节日表演"],
+            ["media/middle/photo-05.jpg", "搭积木的城市"],
+            ["media/middle/photo-06.jpg", "放学前的笑脸"]
+          ],
+          videos: [
+            ["media/videos/middle-01.mp4", "节日舞台", 2.5],
+            ["media/videos/middle-02.mp4", "户外游戏", 2.5]
+          ]
+        },
+        {
+          key: "large",
+          label: "大班",
+          time: "2025.09 - 2026.07",
+          title: "要去更远的地方了",
+          note: "那一年，你会照顾自己，也会照顾别人。毕业不是结束，是把幼儿园给你的勇气，带去下一段路。",
+          stats: [
+            ["03", "第三年毕业"],
+            ["∞", "继续发光"]
+          ],
+          photos: [
+            ["media/large/photo-01.jpg", "毕业合影"],
+            ["media/large/photo-02.jpg", "认真写名字"],
+            ["media/large/photo-03.jpg", "最后一次晨检"],
+            ["media/large/photo-04.jpg", "毕业典礼"],
+            ["media/large/photo-05.jpg", "和老师拥抱"],
+            ["media/large/photo-06.jpg", "奔向夏天"]
+          ],
+          videos: [
+            ["media/videos/large-01.mp4", "毕业节目", 2.5],
+            ["media/videos/large-02.mp4", "老师的祝福", 2.5]
+          ]
+        }
+      ]
+    };
+
+    const modal = document.querySelector("#mediaModal");
+    const modalSlot = document.querySelector("#modalSlot");
+    const modalCaption = document.querySelector("#modalCaption");
+    const closeModal = document.querySelector("#closeModal");
+    const dailyDate = document.querySelector("#dailyDate");
+    const dailyPage = document.querySelector("#dailyPage");
+
+    document.querySelector("#childNameTop").textContent = `${album.childName}的幼儿园成长纪念册`;
+    document.querySelector("#albumYears").textContent = album.yearsText;
+
+    function imageWithFallback(src, alt) {
+      return `<img src="${src}" alt="${alt}" loading="lazy" data-fallback="${fallbackImage}">`;
+    }
+
+    function videoFrame(src, title, frameAt = 2.5) {
+      return `
+        <video
+          data-video-src="${src}#t=${frameAt}"
+          muted
+          playsinline
+          preload="metadata"
+          aria-label="${title}的视频封面"
+          data-video-frame
+          data-frame-at="${frameAt}"
+        ></video>
+      `;
+    }
+
+    function formatDuration(seconds) {
+      if (!Number.isFinite(seconds) || seconds <= 0) return "视频";
+      const wholeSeconds = Math.round(seconds);
+      const minutes = Math.floor(wholeSeconds / 60);
+      const remainder = String(wholeSeconds % 60).padStart(2, "0");
+      return `${String(minutes).padStart(2, "0")}:${remainder}`;
+    }
+
+    function bindImageFallbacks(scope = document) {
+      scope.querySelectorAll("img[data-fallback]:not([data-fallback-bound])").forEach((img) => {
+        img.dataset.fallbackBound = "true";
+        img.addEventListener("error", () => {
+          const owner = img.closest(".photo-card, .daily-media");
+          if (owner) owner.classList.add("is-missing");
+          if (img.dataset.fallbackApplied) return;
+          img.dataset.fallbackApplied = "true";
+          img.src = img.dataset.fallback;
+        });
+      });
+    }
+
+    let videoFrameObserver;
+
+    function loadVideoFrame(video) {
+      if (video.dataset.frameLoading) return;
+      video.dataset.frameLoading = "true";
+      const owner = video.closest(".video-card, .daily-media");
+      const durationScope = video.closest(".daily-reveal") || owner;
+      const durationLabel = durationScope?.querySelector("[data-video-duration]");
+      const requestedFrame = Number(video.dataset.frameAt) || 2.5;
+      let targetFrame = requestedFrame;
+      let playFallbackStarted = false;
+
+      const markFrameReady = () => {
+        video.pause();
+        video.classList.add("is-frame-ready");
+      };
+
+      const playToFrame = () => {
+        if (playFallbackStarted || video.classList.contains("is-frame-ready")) return;
+        playFallbackStarted = true;
+
+        const stopAtFrame = () => {
+          if (video.currentTime >= targetFrame - 0.08 || video.ended) {
+            video.removeEventListener("timeupdate", stopAtFrame);
+            markFrameReady();
+          }
+        };
+
+        video.addEventListener("timeupdate", stopAtFrame);
+        video.play().catch(markFrameReady);
+      };
+
+      const seekToFrame = () => {
+        if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+        const latestFrame = Math.max(0, video.duration - 0.12);
+        targetFrame = Math.min(requestedFrame, latestFrame);
+
+        if (Math.abs(video.currentTime - targetFrame) < 0.08) {
+          markFrameReady();
+          return;
+        }
+
+        try {
+          video.currentTime = targetFrame;
+        } catch {
+          playToFrame();
+        }
+      };
+
+      video.addEventListener("loadedmetadata", () => {
+        if (durationLabel) durationLabel.textContent = formatDuration(video.duration);
+        seekToFrame();
+      }, { once: true });
+
+      video.addEventListener("seeked", markFrameReady, { once: true });
+
+      video.addEventListener("canplay", () => {
+        seekToFrame();
+        window.setTimeout(() => {
+          if (Math.abs(video.currentTime - targetFrame) >= 0.08) playToFrame();
+        }, 180);
+      }, { once: true });
+
+      video.addEventListener("error", () => {
+        if (owner) owner.classList.add("is-missing");
+        if (durationLabel) durationLabel.textContent = "素材待放入";
+      }, { once: true });
+
+      video.src = video.dataset.videoSrc;
+      video.load();
+    }
+
+    function prepareVideoFrames(scope = document) {
+      scope.querySelectorAll("video[data-video-frame]:not([data-frame-bound])").forEach((video) => {
+        video.dataset.frameBound = "true";
+        if (!("IntersectionObserver" in window)) {
+          loadVideoFrame(video);
+          return;
+        }
+
+        if (!videoFrameObserver) {
+          videoFrameObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              videoFrameObserver.unobserve(entry.target);
+              loadVideoFrame(entry.target);
+            });
+          }, { rootMargin: "320px 0px" });
+        }
+
+        videoFrameObserver.observe(video);
+      });
+    }
+
+    const fallbackMemories = album.grades.flatMap((grade) => [
+      ...grade.photos.map(([src, title]) => ({
+        id: src,
+        kind: "photo",
+        src,
+        title,
+        grade: grade.label,
+        time: grade.time
+      })),
+      ...grade.videos.map(([src, title, frameAt]) => ({
+        id: src,
+        kind: "video",
+        src,
+        title,
+        frameAt,
+        grade: grade.label,
+        time: grade.time
+      }))
+    ]);
+
+    function hashText(text) {
+      let hash = 2166136261;
+      for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
+
+    function seededRandom(seed) {
+      let value = seed >>> 0;
+      return () => {
+        value += 0x6D2B79F5;
+        let result = value;
+        result = Math.imul(result ^ (result >>> 15), result | 1);
+        result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
+        return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function shuffledMemories(items) {
+      const shuffled = [...items];
+      const random = seededRandom(hashText(`${album.childName}|${album.yearsText}|daily-memory`));
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const other = Math.floor(random() * (index + 1));
+        [shuffled[index], shuffled[other]] = [shuffled[other], shuffled[index]];
+      }
+      return shuffled;
+    }
+
+    let dailyPool = [];
+    let todayMemory = null;
+    const today = new Date();
+    const dayNumber = Math.floor(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) / 86400000);
+    const todayText = new Intl.DateTimeFormat("zh-CN", {
+      month: "long",
+      day: "numeric",
+      weekday: "long"
+    }).format(today);
+    dailyDate.textContent = todayText;
+
+    async function loadMemories() {
+      if (window.location.protocol === "file:") return fallbackMemories;
+
+      try {
+        const response = await fetch("/api/memories", {
+          headers: { Accept: "application/json" }
+        });
+        if (!response.ok) throw new Error(`Media API returned ${response.status}`);
+
+        const data = await response.json();
+        if (!Array.isArray(data.memories) || data.memories.length === 0) {
+          throw new Error("Media API returned no supported files");
+        }
+        return data.memories;
+      } catch {
+        return fallbackMemories;
+      }
+    }
+
+    async function initializeMemories() {
+      const memories = await loadMemories();
+      dailyPool = shuffledMemories(memories);
+
+      if (!dailyPool.length) {
+        dailyPage.innerHTML = `
+          <div class="daily-loading">
+            <span aria-hidden="true">空</span>
+            <p>暂时没有可用素材</p>
+          </div>
+        `;
+        return;
+      }
+
+      const todayIndex = ((dayNumber % dailyPool.length) + dailyPool.length) % dailyPool.length;
+      todayMemory = dailyPool[todayIndex];
+      renderDailyMemory(todayMemory);
+    }
+
+    function renderDailyMemory(memory, triedIds = new Set()) {
+      const nextTriedIds = new Set(triedIds);
+      nextTriedIds.add(memory.id);
+      const caption = `${memory.grade} · ${memory.title}`;
+      const media = memory.kind === "photo"
+        ? imageWithFallback(memory.src, memory.title)
+        : `${videoFrame(memory.src, memory.title, memory.frameAt)}<span class="play" aria-hidden="true">▶</span>`;
+
+      dailyPage.innerHTML = `
+        <div class="daily-reveal">
+          <button
+            class="daily-media"
+            type="button"
+            data-kind="${memory.kind}"
+            data-src="${memory.src}"
+            data-caption="${caption}"
+            aria-label="${memory.kind === "video" ? "播放" : "查看"}${memory.title}"
+          >
+            ${media}
+          </button>
+          <div class="daily-copy">
+            <div>
+              <b>${memory.title}</b>
+              <span>${memory.grade} · ${memory.time}${memory.kind === "video" ? " · " : ""}<span data-video-duration>${memory.kind === "video" ? "读取时长" : ""}</span></span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const dailyAsset = dailyPage.querySelector(".daily-media img, .daily-media video");
+      dailyAsset.addEventListener("error", () => {
+        const nextAvailable = dailyPool.find((item) => !nextTriedIds.has(item.id));
+        if (nextAvailable) renderDailyMemory(nextAvailable, nextTriedIds);
+      }, { once: true });
+
+      bindImageFallbacks(dailyPage);
+      prepareVideoFrames(dailyPage);
+    }
+
+    initializeMemories();
+
+    document.addEventListener("click", (event) => {
+      const mediaButton = event.target.closest("[data-kind]");
+      if (!mediaButton) return;
+
+      const kind = mediaButton.dataset.kind;
+      const src = mediaButton.dataset.src;
+      const caption = mediaButton.dataset.caption;
+      modalSlot.innerHTML = "";
+      modalCaption.textContent = caption;
+
+      if (kind === "photo") {
+        const image = document.createElement("img");
+        image.className = "modal-media";
+        image.src = src;
+        image.alt = caption;
+        image.addEventListener("error", () => {
+          image.src = fallbackImage;
+        }, { once: true });
+        modalSlot.appendChild(image);
+      } else {
+        const video = document.createElement("video");
+        video.className = "modal-media";
+        video.src = src;
+        video.controls = true;
+        video.playsInline = true;
+        video.preload = "metadata";
+        video.addEventListener("error", () => {
+          modalCaption.textContent = `${caption} · 素材待放入`;
+        }, { once: true });
+        modalSlot.appendChild(video);
+        video.play().catch(() => {});
+      }
+
+      modal.setAttribute("aria-hidden", "false");
+      closeModal.focus();
+    });
+
+    function hideModal() {
+      modal.setAttribute("aria-hidden", "true");
+      modalSlot.querySelectorAll("video").forEach((video) => video.pause());
+      modalSlot.innerHTML = "";
+    }
+
+    closeModal.addEventListener("click", hideModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) hideModal();
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal.getAttribute("aria-hidden") === "false") hideModal();
+    });
+  </script>
+</body>
+</html>
