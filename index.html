@@ -449,6 +449,17 @@
       pointer-events: none;
     }
 
+    .daily-media video,
+    .album-card video {
+      opacity: 0;
+      transition: opacity 160ms ease;
+    }
+
+    .daily-media video.is-frame-ready,
+    .album-card video.is-frame-ready {
+      opacity: 1;
+    }
+
     .daily-media > .play {
       position: absolute;
       top: 50%;
@@ -1424,6 +1435,7 @@
 
   <script>
     const fallbackImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+    const VIDEO_COVER_TIME = 0.12;
 
     const album = {
       childName: "宝贝",
@@ -1515,16 +1527,16 @@
       return `<img src="${src}" alt="${alt}" loading="lazy" data-fallback="${fallbackImage}">`;
     }
 
-    function videoFrame(src, title, frameAt = 2.5) {
+    function videoFrame(src, title) {
       return `
         <video
-          data-video-src="${src}#t=${frameAt}"
+          data-video-src="${src}#t=${VIDEO_COVER_TIME}"
           muted
           playsinline
-          preload="metadata"
+          preload="auto"
           aria-label="${title}的视频封面"
           data-video-frame
-          data-frame-at="${frameAt}"
+          data-frame-at="${VIDEO_COVER_TIME}"
         ></video>
       `;
     }
@@ -1558,7 +1570,7 @@
       const owner = video.closest(".video-card, .daily-media, .album-card");
       const durationScope = video.closest(".daily-reveal") || owner;
       const durationLabel = durationScope?.querySelector("[data-video-duration]");
-      const requestedFrame = Number(video.dataset.frameAt) || 2.5;
+      const requestedFrame = Number(video.dataset.frameAt) || VIDEO_COVER_TIME;
       let targetFrame = requestedFrame;
       let playFallbackStarted = false;
 
@@ -1604,6 +1616,7 @@
         seekToFrame();
       }, { once: true });
 
+      video.addEventListener("loadeddata", markFrameReady, { once: true });
       video.addEventListener("seeked", markFrameReady, { once: true });
 
       video.addEventListener("canplay", () => {
@@ -1696,7 +1709,6 @@
 
     let dailyPool = [];
     let todayMemory = null;
-    const temporaryFeaturedMemoryId = "幼儿园时光/小班/2023年9月4日-入园第一天/";
     const today = new Date();
     const dayNumber = Math.floor(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) / 86400000);
     const todayText = new Intl.DateTimeFormat("zh-CN", {
@@ -1740,16 +1752,14 @@
       }
 
       const todayIndex = ((dayNumber % dailyPool.length) + dailyPool.length) % dailyPool.length;
-      todayMemory =
-        dailyPool.find((memory) => memory.id === temporaryFeaturedMemoryId) ||
-        dailyPool[todayIndex];
+      todayMemory = dailyPool[todayIndex];
       renderDailyMemory(todayMemory);
     }
 
     function albumItemMarkup(item, albumTitle, position) {
       const label = `${albumTitle}第${position}个片段`;
       if (item.kind === "photo") return imageWithFallback(item.src, label);
-      return `${videoFrame(item.src, label, item.frameAt)}<span class="play" aria-hidden="true">▶</span>`;
+      return `${videoFrame(item.src, label)}<span class="play" aria-hidden="true">▶</span>`;
     }
 
     function renderAlbumStack(memory, requestedIndex = 0) {
@@ -1956,7 +1966,7 @@
       const caption = `${memory.grade} · ${memory.title}`;
       const media = memory.kind === "photo"
         ? imageWithFallback(memory.src, memory.title)
-        : `${videoFrame(memory.src, memory.title, memory.frameAt)}<span class="play" aria-hidden="true">▶</span>`;
+        : `${videoFrame(memory.src, memory.title)}<span class="play" aria-hidden="true">▶</span>`;
 
       dailyPage.innerHTML = `
         <div class="daily-reveal">
