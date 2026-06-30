@@ -460,6 +460,14 @@
       opacity: 1;
     }
 
+    .video-duration-probe {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
     .daily-media > .play {
       position: absolute;
       top: 50%;
@@ -1541,6 +1549,40 @@
       `;
     }
 
+    function videoPosterUrl(src) {
+      const separator = src.includes("?") ? "&" : "?";
+      return `${src}${separator}ci-process=snapshot&time=1&width=960&height=0&format=jpg&rotate=auto&mode=keyframe`;
+    }
+
+    function videoCover(src, title, { eager = false, showDuration = false } = {}) {
+      const priority = eager ? `loading="eager" fetchpriority="high"` : `loading="lazy"`;
+      const durationProbe = showDuration
+        ? `
+          <video
+            class="video-duration-probe"
+            data-duration-src="${src}"
+            muted
+            playsinline
+            preload="metadata"
+            aria-hidden="true"
+          ></video>
+        `
+        : "";
+
+      return `
+        <img
+          class="video-poster"
+          src="${videoPosterUrl(src)}"
+          alt="${title}的视频封面"
+          ${priority}
+          data-video-poster
+          data-video-src="${src}"
+          data-video-title="${title}"
+        >
+        ${durationProbe}
+      `;
+    }
+
     function formatDuration(seconds) {
       if (!Number.isFinite(seconds) || seconds <= 0) return "视频";
       const wholeSeconds = Math.round(seconds);
@@ -1657,6 +1699,54 @@
       });
     }
 
+    function bindVideoPosters(scope = document) {
+      scope.querySelectorAll("img[data-video-poster]:not([data-poster-bound])").forEach((poster) => {
+        poster.dataset.posterBound = "true";
+
+        const useVideoFallback = () => {
+          if (!poster.isConnected) return;
+          const video = document.createElement("video");
+          video.muted = true;
+          video.playsInline = true;
+          video.preload = "auto";
+          video.setAttribute("aria-label", `${poster.dataset.videoTitle}的视频封面`);
+          video.dataset.videoSrc = `${poster.dataset.videoSrc}#t=${VIDEO_COVER_TIME}`;
+          video.dataset.frameAt = String(VIDEO_COVER_TIME);
+          video.dataset.videoFrame = "";
+          poster.replaceWith(video);
+          loadVideoFrame(video);
+        };
+
+        poster.addEventListener("error", useVideoFallback, { once: true });
+        if (poster.complete && poster.naturalWidth === 0) useVideoFallback();
+      });
+    }
+
+    function bindVideoDurationProbes(scope = document) {
+      scope.querySelectorAll("video[data-duration-src]:not([data-duration-bound])").forEach((video) => {
+        video.dataset.durationBound = "true";
+        const durationLabel = video.closest(".daily-reveal")?.querySelector("[data-video-duration]");
+
+        const loadDuration = () => {
+          if (!video.isConnected) return;
+          video.addEventListener("loadedmetadata", () => {
+            if (durationLabel) durationLabel.textContent = formatDuration(video.duration);
+          }, { once: true });
+          video.addEventListener("error", () => {
+            if (durationLabel) durationLabel.textContent = "视频";
+          }, { once: true });
+          video.src = video.dataset.durationSrc;
+          video.load();
+        };
+
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(loadDuration, { timeout: 1200 });
+        } else {
+          window.setTimeout(loadDuration, 500);
+        }
+      });
+    }
+
     const fallbackMemories = album.grades.flatMap((grade) => [
       ...grade.photos.map(([src, title]) => ({
         id: src,
@@ -1756,10 +1846,10 @@
       renderDailyMemory(todayMemory);
     }
 
-    function albumItemMarkup(item, albumTitle, position) {
+    function albumItemMarkup(item, albumTitle, position, eager = false) {
       const label = `${albumTitle}第${position}个片段`;
       if (item.kind === "photo") return imageWithFallback(item.src, label);
-      return `${videoFrame(item.src, label)}<span class="play" aria-hidden="true">▶</span>`;
+      return `${videoCover(item.src, label, { eager })}<span class="play" aria-hidden="true">▶</span>`;
     }
 
     function renderAlbumStack(memory, requestedIndex = 0) {
@@ -1795,7 +1885,7 @@
 
         cards.push(`
           <${tag} class="${cardClass}" ${attributes}>
-            ${albumItemMarkup(item, memory.title, itemIndex + 1)}
+            ${albumItemMarkup(item, memory.title, itemIndex + 1, isActive)}
           </${tag}>
         `);
       }
@@ -1803,6 +1893,7 @@
       stack.innerHTML = cards.join("");
       positionLabel.textContent = `${activeIndex + 1} / ${total}`;
       bindImageFallbacks(stack);
+      bindVideoPosters(stack);
       prepareVideoFrames(stack);
       bindAlbumDrag(memory, activeIndex);
     }
@@ -1966,7 +2057,7 @@
       const caption = `${memory.grade} · ${memory.title}`;
       const media = memory.kind === "photo"
         ? imageWithFallback(memory.src, memory.title)
-        : `${videoFrame(memory.src, memory.title)}<span class="play" aria-hidden="true">▶</span>`;
+        : `${videoCover(memory.src, memory.title, { eager: true, showDuration: true })}<span class="play" aria-hidden="true">▶</span>`;
 
       dailyPage.innerHTML = `
         <div class="daily-reveal">
@@ -1996,6 +2087,8 @@
       }, { once: true });
 
       bindImageFallbacks(dailyPage);
+      bindVideoPosters(dailyPage);
+      bindVideoDurationProbes(dailyPage);
       prepareVideoFrames(dailyPage);
     }
 
