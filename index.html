@@ -106,18 +106,15 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 9px;
+      gap: 11px;
       font-weight: 700;
     }
 
-    .brand-mark {
-      width: 18px;
-      height: 18px;
-      background:
-        linear-gradient(90deg, transparent 7px, rgba(39, 52, 46, 0.72) 7px 9px, transparent 9px),
-        linear-gradient(var(--leaf), var(--leaf));
-      border-radius: 50% 50% 45% 45%;
-      box-shadow: 0 0 0 5px rgba(106, 169, 111, 0.18);
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      object-fit: contain;
     }
 
     .hero-copy {
@@ -964,17 +961,87 @@
       text-align: center;
     }
 
-    .daily-loading span {
+    .album-loader {
+      position: relative;
+      width: 86px;
+      height: 62px;
+      margin: 0 auto 20px;
+      perspective: 420px;
+      transform-style: preserve-3d;
+    }
+
+    .album-loader::before {
+      position: absolute;
+      inset: 2px 0 0 8px;
+      content: "";
+      border: 2px solid #087440;
+      border-radius: 3px 8px 8px 3px;
+      background: #087440;
+      box-shadow: 0 10px 22px rgba(39, 52, 46, 0.16);
+      transform: rotate(-2deg);
+    }
+
+    .album-loader__page {
+      position: absolute;
+      inset: 5px 5px 4px 9px;
+      border: 1px solid rgba(39, 52, 46, 0.14);
+      border-radius: 2px 7px 7px 2px;
+      background: #fffdf7;
+      box-shadow: 1px 0 0 rgba(39, 52, 46, 0.08);
+      transform-origin: 2px 50%;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      animation: album-page-turn 2.4s cubic-bezier(0.55, 0.08, 0.35, 0.92) infinite;
+    }
+
+    .album-loader__page::before {
+      position: absolute;
+      inset: 7px 8px 16px 10px;
+      content: "";
+      border-radius: 2px;
+      background:
+        linear-gradient(150deg, transparent 58%, rgba(255, 255, 255, 0.72) 59%),
+        var(--page-photo, #64b8d8);
+    }
+
+    .album-loader__page::after {
+      position: absolute;
+      right: 14px;
+      bottom: 8px;
+      left: 14px;
+      height: 2px;
+      content: "";
+      background: rgba(39, 52, 46, 0.2);
+      box-shadow: 0 4px 0 rgba(39, 52, 46, 0.1);
+    }
+
+    .album-loader__page:nth-child(1) {
+      z-index: 3;
+      --page-photo: #64b8d8;
+    }
+
+    .album-loader__page:nth-child(2) {
+      z-index: 2;
+      --page-photo: #c9a15c;
+      animation-delay: 0.42s;
+    }
+
+    .album-loader__page:nth-child(3) {
+      z-index: 1;
+      --page-photo: #6aa96f;
+      animation-delay: 0.84s;
+    }
+
+    .daily-loading__empty {
       display: grid;
-      width: 74px;
-      height: 74px;
+      width: 66px;
+      height: 66px;
       margin: 0 auto 16px;
       place-items: center;
       border: 1px solid rgba(39, 52, 46, 0.22);
       border-radius: 50%;
       font-family: "LXGW WenKai", "STKaiti", "KaiTi", serif;
-      font-size: 27px;
-      animation: loading-page 1.5s ease-in-out infinite;
+      font-size: 24px;
     }
 
     .daily-loading p {
@@ -1000,11 +1067,16 @@
       transform: none;
     }
 
-    @keyframes loading-page {
-      50% {
-        color: var(--ink);
-        border-color: rgba(39, 52, 46, 0.48);
-        transform: rotate(5deg);
+    @keyframes album-page-turn {
+      0%,
+      18% {
+        opacity: 1;
+        transform: rotateY(0deg);
+      }
+      58%,
+      100% {
+        opacity: 0.12;
+        transform: rotateY(-158deg);
       }
     }
 
@@ -1087,6 +1159,16 @@
 
       .only-topbar {
         padding: 18px 16px 8px;
+      }
+
+      .brand {
+        gap: 9px;
+      }
+
+      .brand-logo {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
       }
 
       .only-main {
@@ -1190,13 +1272,28 @@
         animation-duration: 1ms !important;
         transition-duration: 1ms !important;
       }
+
+      .album-loader__page {
+        animation: none !important;
+      }
+
+      .album-loader__page:nth-child(1) {
+        transform: rotateY(-22deg);
+      }
+
+      .album-loader__page:nth-child(2) {
+        transform: translateX(3px);
+      }
     }
   </style>
 </head>
 <body>
   <div class="page daily-only">
     <header class="only-topbar" aria-label="页面信息">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span id="childNameTop">幼儿园成长纪念册</span></div>
+      <div class="brand">
+        <img class="brand-logo" src="assets/school-emblem.png" alt="锡林浩特市楚古兰幼儿园校徽">
+        <span id="childNameTop">大三班成长纪念册</span>
+      </div>
       <div id="albumYears">2023-2026</div>
     </header>
 
@@ -1211,7 +1308,11 @@
         </header>
         <div class="memory-stage" id="dailyPage" aria-live="polite">
           <div class="daily-loading">
-            <span aria-hidden="true">忆</span>
+            <div class="album-loader" aria-hidden="true">
+              <span class="album-loader__page"></span>
+              <span class="album-loader__page"></span>
+              <span class="album-loader__page"></span>
+            </div>
             <p>正在翻开今天这一页</p>
           </div>
         </div>
@@ -1232,6 +1333,7 @@
 
     const album = {
       childName: "宝贝",
+      bookTitle: "大三班成长纪念册",
       yearsText: "2023-2026",
       grades: [
         {
@@ -1313,7 +1415,7 @@
     const dailyDate = document.querySelector("#dailyDate");
     const dailyPage = document.querySelector("#dailyPage");
 
-    document.querySelector("#childNameTop").textContent = `${album.childName}的幼儿园成长纪念册`;
+    document.querySelector("#childNameTop").textContent = album.bookTitle;
     document.querySelector("#albumYears").textContent = album.yearsText;
 
     function imageWithFallback(src, alt) {
@@ -1536,7 +1638,7 @@
       if (!dailyPool.length) {
         dailyPage.innerHTML = `
           <div class="daily-loading">
-            <span aria-hidden="true">空</span>
+            <span class="daily-loading__empty" aria-hidden="true">空</span>
             <p>暂时没有可用素材</p>
           </div>
         `;
