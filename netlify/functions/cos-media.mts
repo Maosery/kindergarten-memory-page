@@ -140,9 +140,9 @@ function jsonResponse(data: unknown, status = 200) {
   });
 }
 
-export function metadataFromKey(key: string) {
+export function metadataFromKey(key: string, stripExtension = true) {
   const fileName = key.split("/").pop() || key;
-  const baseName = fileName.replace(/\.[^.]+$/, "").trim();
+  const baseName = (stripExtension ? fileName.replace(/\.[^.]+$/, "") : fileName).trim();
   const fullDate = baseName.match(
     /^(\d{4})[-_.年](\d{1,2})[-_.月](\d{1,2})(?:日)?[-_\s]+(.+)$/
   );
@@ -194,6 +194,99 @@ function kindFromKey(key: string) {
   return null;
 }
 
+type DirectoryConfig = {
+  grade: string;
+  time: string;
+  prefix: string;
+};
+
+type CosObject = {
+  Key?: string;
+  LastModified?: string;
+};
+
+export function memoriesFromObjects(objects: CosObject[], directory: DirectoryConfig) {
+  const memories = [];
+  const eventAlbums = new Map<string, {
+    id: string;
+    folderName: string;
+    items: Array<{
+      id: string;
+      kind: "photo" | "video";
+      src: string;
+      title: string;
+      frameAt: number;
+      lastModified: string;
+    }>;
+  }>();
+
+  for (const object of objects) {
+    const key = object.Key;
+    const kind = typeof key === "string" ? kindFromKey(key) : null;
+    if (!key || !key.startsWith(directory.prefix) || key.endsWith("/") || !kind) continue;
+
+    const relativeKey = key.slice(directory.prefix.length);
+    const segments = relativeKey.split("/").filter(Boolean);
+    if (!segments.length) continue;
+
+    const item = {
+      id: key,
+      kind,
+      src: publicObjectUrl(key),
+      title: metadataFromKey(key).title,
+      frameAt: 2.5,
+      lastModified: object.LastModified || ""
+    };
+
+    if (segments.length === 1) {
+      memories.push({
+        ...item,
+        ...metadataFromKey(key),
+        grade: directory.grade,
+        time: directory.time
+      });
+      continue;
+    }
+
+    const folderPath = segments.slice(0, -1).join("/");
+    const albumId = `${directory.prefix}${folderPath}/`;
+    const existingAlbum = eventAlbums.get(albumId) || {
+      id: albumId,
+      folderName: segments.at(-2) || folderPath,
+      items: []
+    };
+    existingAlbum.items.push(item);
+    eventAlbums.set(albumId, existingAlbum);
+  }
+
+  for (const album of eventAlbums.values()) {
+    album.items.sort((left, right) =>
+      left.id.localeCompare(right.id, "zh-CN", { numeric: true, sensitivity: "base" })
+    );
+    const photoCount = album.items.filter((item) => item.kind === "photo").length;
+    const videoCount = album.items.length - photoCount;
+    const lastModified = album.items.reduce(
+      (latest, item) => item.lastModified > latest ? item.lastModified : latest,
+      ""
+    );
+
+    memories.push({
+      id: album.id,
+      kind: "album",
+      ...metadataFromKey(album.folderName, false),
+      grade: directory.grade,
+      time: directory.time,
+      itemCount: album.items.length,
+      photoCount,
+      videoCount,
+      items: album.items,
+      lastModified
+    });
+  }
+
+  return memories;
+}
+
 export default async (request: Request, _context: Context) => {
   if (request.method !== "GET") {
     return jsonResponse({ error: "Method not allowed" }, 405);
@@ -213,6 +306,7 @@ export default async (request: Request, _context: Context) => {
     const memories = [];
 
     for (const directory of directories) {
+      const directoryObjects: CosObject[] = [];
       let marker = "";
       let hasMore = true;
 
@@ -222,36 +316,28 @@ export default async (request: Request, _context: Context) => {
           ? []
           : Array.isArray(page.Contents) ? page.Contents : [page.Contents];
 
-        for (const object of objects) {
-          const key = object.Key;
-          const kind = typeof key === "string" ? kindFromKey(key) : null;
-          if (!key || key.endsWith("/") || !kind) continue;
-          const metadata = metadataFromKey(key);
-
-          memories.push({
-            id: key,
-            kind,
-            src: publicObjectUrl(key),
-            ...metadata,
-            grade: directory.grade,
-            time: directory.time,
-            frameAt: 2.5,
-            lastModified: object.LastModified || ""
-          });
-        }
+        directoryObjects.push(...objects);
 
         hasMore = page.IsTruncated === true || page.IsTruncated === "true";
         marker = page.NextMarker || objects.at(-1)?.Key || "";
         if (hasMore && !marker) break;
       }
+
+      memories.push(...memoriesFromObjects(directoryObjects, directory));
     }
 
-    memories.sort((left, right) => left.id.localeCompare(right.id, "zh-CN"));
+    memories.sort((left, right) =>
+      left.id.localeCompare(right.id, "zh-CN", { numeric: true, sensitivity: "base" })
+    );
 
     return jsonResponse({
       bucket: BUCKET,
       region: REGION,
       count: memories.length,
+      assetCount: memories.reduce(
+        (total, memory) => total + (memory.kind === "album" ? memory.itemCount : 1),
+        0
+      ),
       memories
     });
   } catch (error) {

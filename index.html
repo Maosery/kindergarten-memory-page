@@ -458,6 +458,102 @@
       pointer-events: none;
     }
 
+    .album-stack-wrap {
+      width: calc(100% - 30px);
+      margin: 0 auto;
+      padding: 12px 0 10px;
+    }
+
+    .album-stack {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .album-card {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 9px solid #fff;
+      border-radius: var(--radius);
+      background: #e9d8b7;
+      box-shadow: 0 18px 46px rgba(78, 57, 26, 0.2);
+      overflow: hidden;
+      transform-origin: 50% 112%;
+      transition:
+        transform 260ms cubic-bezier(0.2, 0.76, 0.24, 1),
+        opacity 220ms ease,
+        box-shadow 220ms ease;
+      will-change: transform;
+    }
+
+    .album-card img,
+    .album-card video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .album-card > .play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .album-card--back-two {
+      z-index: 1;
+      opacity: 0.72;
+      transform: translate(-10px, 11px) rotate(-3.2deg) scale(0.965);
+      pointer-events: none;
+    }
+
+    .album-card--back-one {
+      z-index: 2;
+      opacity: 0.9;
+      transform: translate(9px, 6px) rotate(2.2deg) scale(0.985);
+      pointer-events: none;
+    }
+
+    .album-card--active {
+      z-index: 3;
+      cursor: grab;
+    }
+
+    .album-card--active.is-dragging {
+      cursor: grabbing;
+      transition: none;
+    }
+
+    .album-card--active.is-swipe-left {
+      opacity: 0;
+      transform: translate3d(-115%, 10px, 0) rotate(-13deg);
+    }
+
+    .album-card--active.is-swipe-right {
+      opacity: 0;
+      transform: translate3d(115%, 10px, 0) rotate(13deg);
+    }
+
+    .album-position {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-family: "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
+      font-size: 13px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
     .daily-copy {
       display: flex;
       align-items: center;
@@ -1187,6 +1283,19 @@
         border-width: 6px;
       }
 
+      .album-stack-wrap {
+        width: calc(100% - 18px);
+        padding-top: 8px;
+      }
+
+      .album-stack {
+        aspect-ratio: 4 / 3;
+      }
+
+      .album-card {
+        border-width: 6px;
+      }
+
       .topbar {
         align-items: flex-start;
         font-size: 12px;
@@ -1432,7 +1541,7 @@
       scope.querySelectorAll("img[data-fallback]:not([data-fallback-bound])").forEach((img) => {
         img.dataset.fallbackBound = "true";
         img.addEventListener("error", () => {
-          const owner = img.closest(".photo-card, .daily-media");
+          const owner = img.closest(".photo-card, .daily-media, .album-card");
           if (owner) owner.classList.add("is-missing");
           if (img.dataset.fallbackApplied) return;
           img.dataset.fallbackApplied = "true";
@@ -1446,7 +1555,7 @@
     function loadVideoFrame(video) {
       if (video.dataset.frameLoading) return;
       video.dataset.frameLoading = "true";
-      const owner = video.closest(".video-card, .daily-media");
+      const owner = video.closest(".video-card, .daily-media, .album-card");
       const durationScope = video.closest(".daily-reveal") || owner;
       const durationLabel = durationScope?.querySelector("[data-video-duration]");
       const requestedFrame = Number(video.dataset.frameAt) || 2.5;
@@ -1634,7 +1743,211 @@
       renderDailyMemory(todayMemory);
     }
 
+    function albumItemMarkup(item, albumTitle, position) {
+      const label = `${albumTitle}第${position}个片段`;
+      if (item.kind === "photo") return imageWithFallback(item.src, label);
+      return `${videoFrame(item.src, label, item.frameAt)}<span class="play" aria-hidden="true">▶</span>`;
+    }
+
+    function renderAlbumStack(memory, requestedIndex = 0) {
+      const stack = dailyPage.querySelector("[data-album-stack]");
+      const positionLabel = dailyPage.querySelector("[data-album-position]");
+      const total = memory.items.length;
+      if (!stack || !positionLabel || !total) return;
+
+      const activeIndex = ((requestedIndex % total) + total) % total;
+      const visibleLayers = Math.min(total, 3);
+      const cards = [];
+
+      for (let offset = visibleLayers - 1; offset >= 0; offset -= 1) {
+        const itemIndex = (activeIndex + offset) % total;
+        const item = memory.items[itemIndex];
+        const isActive = offset === 0;
+        const cardClass = isActive
+          ? "album-card album-card--active"
+          : offset === 1
+            ? "album-card album-card--back-one"
+            : "album-card album-card--back-two";
+        const tag = isActive ? "button" : "div";
+        const caption = `${memory.grade} · ${memory.title} · ${itemIndex + 1}/${total}`;
+        const attributes = isActive
+          ? `
+            type="button"
+            data-kind="${item.kind}"
+            data-src="${item.src}"
+            data-caption="${caption}"
+            aria-label="${item.kind === "video" ? "播放" : "查看"}${memory.title}第${itemIndex + 1}个片段"
+          `
+          : `aria-hidden="true"`;
+
+        cards.push(`
+          <${tag} class="${cardClass}" ${attributes}>
+            ${albumItemMarkup(item, memory.title, itemIndex + 1)}
+          </${tag}>
+        `);
+      }
+
+      stack.innerHTML = cards.join("");
+      positionLabel.textContent = `${activeIndex + 1} / ${total}`;
+      bindImageFallbacks(stack);
+      prepareVideoFrames(stack);
+      bindAlbumDrag(memory, activeIndex);
+    }
+
+    function bindAlbumDrag(memory, activeIndex) {
+      const stack = dailyPage.querySelector("[data-album-stack]");
+      const activeCard = stack?.querySelector(".album-card--active");
+      const backCard = stack?.querySelector(".album-card--back-one");
+      if (!stack || !activeCard || memory.items.length < 2) return;
+
+      let pointerId = null;
+      let startX = 0;
+      let startY = 0;
+      let deltaX = 0;
+      let deltaY = 0;
+      let startedAt = 0;
+      let moved = false;
+      let suppressClick = false;
+
+      const restoreBackCard = () => {
+        if (!backCard) return;
+        backCard.style.transform = "";
+        backCard.style.opacity = "";
+      };
+
+      const releasePointer = () => {
+        if (pointerId === null) return;
+        try {
+          if (activeCard.hasPointerCapture(pointerId)) {
+            activeCard.releasePointerCapture(pointerId);
+          }
+        } catch {
+          // The browser may release capture when a vertical page scroll begins.
+        }
+        pointerId = null;
+      };
+
+      const returnToStack = () => {
+        activeCard.classList.remove("is-dragging");
+        window.requestAnimationFrame(() => {
+          activeCard.style.transform = "";
+          activeCard.style.boxShadow = "";
+          restoreBackCard();
+        });
+      };
+
+      const finishDrag = (cancelled = false) => {
+        if (pointerId === null) return;
+        const elapsed = Math.max(Date.now() - startedAt, 1);
+        const velocity = Math.abs(deltaX) / elapsed;
+        const threshold = Math.min(110, Math.max(64, stack.clientWidth * 0.18));
+        const shouldTurn = !cancelled && moved &&
+          (Math.abs(deltaX) >= threshold || (Math.abs(deltaX) >= 30 && velocity > 0.55));
+
+        suppressClick = moved;
+        releasePointer();
+
+        if (!shouldTurn) {
+          returnToStack();
+          window.setTimeout(() => { suppressClick = false; }, 320);
+          return;
+        }
+
+        activeCard.classList.remove("is-dragging");
+        activeCard.style.transform = "";
+        activeCard.style.boxShadow = "";
+        activeCard.classList.add(deltaX < 0 ? "is-swipe-left" : "is-swipe-right");
+        restoreBackCard();
+
+        const nextIndex = deltaX < 0 ? activeIndex + 1 : activeIndex - 1;
+        const releaseDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
+        window.setTimeout(() => renderAlbumStack(memory, nextIndex), releaseDelay);
+      };
+
+      activeCard.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+        pointerId = event.pointerId;
+        startX = event.clientX;
+        startY = event.clientY;
+        deltaX = 0;
+        deltaY = 0;
+        moved = false;
+        suppressClick = false;
+        startedAt = Date.now();
+        activeCard.setPointerCapture(pointerId);
+      });
+
+      activeCard.addEventListener("pointermove", (event) => {
+        if (event.pointerId !== pointerId) return;
+        deltaX = event.clientX - startX;
+        deltaY = event.clientY - startY;
+
+        if (!moved) {
+          if (Math.abs(deltaX) < 7 && Math.abs(deltaY) < 7) return;
+          if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+          moved = true;
+          activeCard.classList.add("is-dragging");
+        }
+
+        if (event.cancelable) event.preventDefault();
+        const rotation = Math.max(-11, Math.min(11, deltaX / 22));
+        const lift = Math.max(-10, Math.min(10, deltaY * 0.14));
+        const progress = Math.min(Math.abs(deltaX) / Math.max(stack.clientWidth * 0.45, 1), 1);
+        activeCard.style.transform =
+          `translate3d(${deltaX}px, ${lift}px, 0) rotate(${rotation}deg)`;
+        activeCard.style.boxShadow =
+          `0 ${18 + progress * 10}px ${46 + progress * 20}px rgba(78, 57, 26, ${0.2 + progress * 0.08})`;
+
+        if (backCard) {
+          const shiftX = 9 * (1 - progress);
+          const shiftY = 6 * (1 - progress);
+          const backRotation = 2.2 * (1 - progress);
+          const scale = 0.985 + 0.015 * progress;
+          backCard.style.transform =
+            `translate(${shiftX}px, ${shiftY}px) rotate(${backRotation}deg) scale(${scale})`;
+          backCard.style.opacity = String(0.9 + 0.1 * progress);
+        }
+      });
+
+      activeCard.addEventListener("pointerup", () => finishDrag(false));
+      activeCard.addEventListener("pointercancel", () => finishDrag(true));
+      activeCard.addEventListener("dragstart", (event) => event.preventDefault());
+      activeCard.addEventListener("click", (event) => {
+        if (!suppressClick) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, true);
+    }
+
+    function renderAlbumMemory(memory) {
+      const mediaLabel = memory.videoCount
+        ? `${memory.itemCount}个影像片段`
+        : `${memory.itemCount}张照片`;
+
+      dailyPage.innerHTML = `
+        <div class="daily-reveal daily-reveal--album">
+          <div class="album-stack-wrap">
+            <div class="album-stack" data-album-stack></div>
+          </div>
+          <div class="daily-copy">
+            <div>
+              <b>${memory.title}</b>
+              <span>${memory.dateLabel ? `${memory.dateLabel} · ` : ""}${memory.grade} · ${mediaLabel}</span>
+            </div>
+            <div class="album-position" data-album-position></div>
+          </div>
+        </div>
+      `;
+
+      renderAlbumStack(memory);
+    }
+
     function renderDailyMemory(memory, triedIds = new Set()) {
+      if (memory.kind === "album") {
+        renderAlbumMemory(memory);
+        return;
+      }
+
       const nextTriedIds = new Set(triedIds);
       nextTriedIds.add(memory.id);
       const caption = `${memory.grade} · ${memory.title}`;
@@ -1664,7 +1977,7 @@
       `;
 
       const dailyAsset = dailyPage.querySelector(".daily-media img, .daily-media video");
-      dailyAsset.addEventListener("error", () => {
+      dailyAsset?.addEventListener("error", () => {
         const nextAvailable = dailyPool.find((item) => !nextTriedIds.has(item.id));
         if (nextAvailable) renderDailyMemory(nextAvailable, nextTriedIds);
       }, { once: true });
