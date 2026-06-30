@@ -1,5 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
 import { XMLParser } from "fast-xml-parser";
+import type { Config, Context } from "@netlify/functions";
 
 declare const Netlify: {
   env: {
@@ -9,7 +10,6 @@ declare const Netlify: {
 
 const BUCKET = "maosery-1257301643";
 const REGION = "ap-beijing";
-const URL_EXPIRES_SECONDS = 60 * 60 * 12;
 
 const directories = [
   { grade: "小班", time: "小班时光", prefix: "幼儿园时光/小班/" },
@@ -94,15 +94,9 @@ function createAuthorization(options: {
   ].join("&");
 }
 
-function signedObjectUrl(key: string, secretId: string, secretKey: string) {
-  const authorization = createAuthorization({
-    secretId,
-    secretKey,
-    pathname: `/${key}`,
-    expires: URL_EXPIRES_SECONDS
-  });
+function publicObjectUrl(key: string) {
   const encodedKey = key.split("/").map(safeEncode).join("/");
-  return `https://${cosHost}/${encodedKey}?${authorization}`;
+  return `https://${cosHost}/${encodedKey}`;
 }
 
 async function getBucketPage(
@@ -146,12 +140,51 @@ function jsonResponse(data: unknown, status = 200) {
   });
 }
 
-function titleFromKey(key: string) {
+export function metadataFromKey(key: string) {
   const fileName = key.split("/").pop() || key;
-  return fileName
-    .replace(/\.[^.]+$/, "")
-    .replace(/[_-]+/g, " ")
-    .trim();
+  const baseName = fileName.replace(/\.[^.]+$/, "").trim();
+  const fullDate = baseName.match(
+    /^(\d{4})[-_.年](\d{1,2})[-_.月](\d{1,2})(?:日)?[-_\s]+(.+)$/
+  );
+  const compactDate = baseName.match(/^(\d{4})(\d{2})(\d{2})[-_\s]+(.+)$/);
+  const monthDay = baseName.match(/^(\d{1,2})[-_.月](\d{1,2})(?:日)?[-_\s]+(.+)$/);
+  const compactMonthDay = baseName.match(/^(\d{2})(\d{2})[-_\s]+(.+)$/);
+  const match = fullDate || compactDate;
+
+  if (match) {
+    const [, year, month, day, rawTitle] = match;
+    return {
+      title: rawTitle.replace(/_/g, " ").trim(),
+      date: `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
+      dateLabel: `${Number(year)}年${Number(month)}月${Number(day)}日`
+    };
+  }
+
+  const shortDate = monthDay || compactMonthDay;
+  if (shortDate) {
+    const [, month, day, rawTitle] = shortDate;
+    return {
+      title: rawTitle.replace(/_/g, " ").trim(),
+      date: `${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
+      dateLabel: `${Number(month)}月${Number(day)}日`
+    };
+  }
+
+  const separatorIndex = baseName.indexOf("-");
+  if (separatorIndex > 0) {
+    const rawDate = baseName.slice(0, separatorIndex).trim();
+    return {
+      title: baseName.slice(separatorIndex + 1).replace(/_/g, " ").trim(),
+      date: rawDate,
+      dateLabel: rawDate
+    };
+  }
+
+  return {
+    title: baseName.replace(/_/g, " ").trim(),
+    date: "",
+    dateLabel: ""
+  };
 }
 
 function kindFromKey(key: string) {
@@ -161,7 +194,7 @@ function kindFromKey(key: string) {
   return null;
 }
 
-export default async (request: Request) => {
+export default async (request: Request, _context: Context) => {
   if (request.method !== "GET") {
     return jsonResponse({ error: "Method not allowed" }, 405);
   }
@@ -193,12 +226,13 @@ export default async (request: Request) => {
           const key = object.Key;
           const kind = typeof key === "string" ? kindFromKey(key) : null;
           if (!key || key.endsWith("/") || !kind) continue;
+          const metadata = metadataFromKey(key);
 
           memories.push({
             id: key,
             kind,
-            src: signedObjectUrl(key, secretId, secretKey),
-            title: titleFromKey(key),
+            src: publicObjectUrl(key),
+            ...metadata,
             grade: directory.grade,
             time: directory.time,
             frameAt: 2.5,
@@ -226,7 +260,7 @@ export default async (request: Request) => {
   }
 };
 
-export const config = {
+export const config: Config = {
   path: "/api/memories",
   method: ["GET"]
 };

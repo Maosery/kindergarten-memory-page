@@ -1571,7 +1571,7 @@
           <div class="daily-copy">
             <div>
               <b>${memory.title}</b>
-              <span>${memory.grade} · ${memory.time}${memory.kind === "video" ? " · " : ""}<span data-video-duration>${memory.kind === "video" ? "读取时长" : ""}</span></span>
+              <span>${memory.dateLabel ? `${memory.dateLabel} · ` : ""}${memory.grade}${memory.kind === "video" ? " · " : ""}<span data-video-duration>${memory.kind === "video" ? "读取时长" : ""}</span></span>
             </div>
           </div>
         </div>

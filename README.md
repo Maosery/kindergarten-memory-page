@@ -14,12 +14,20 @@
 
 存储桶为 `maosery-1257301643`，地域为北京 `ap-beijing`。函数会根据文件扩展名自动判断类型，并使用文件名作为标题。
 
+推荐使用“日期-标题”的文件名：
+
+- `2023-09-01-第一次上台.mp4`
+- `2024.05.20-春游合影.jpg`
+- `0601-儿童节表演.mp4`
+
+页面会自动拆分日期和标题，并在媒体下方显示。完整日期支持 `YYYY-MM-DD`、`YYYY.MM.DD`、`YYYYMMDD`，月日格式支持 `MM-DD`、`MM.DD` 或 `MMDD`。
+
 在 Netlify 的 `Project configuration > Environment variables` 中添加：
 
 - `TENCENT_COS_SECRET_ID`
 - `TENCENT_COS_SECRET_KEY`
 
-这两个变量应标记为 Secret，并包含 Builds、Functions 作用域。建议使用仅允许该存储桶 `cos:GetBucket` 和 `cos:GetObject` 的子账号密钥，不要把密钥写入 GitHub 或 `index.html`。
+这两个变量应标记为 Secret，并包含 Functions 作用域。由于文件本身为公有读，建议使用仅允许该存储桶 `cos:GetBucket` 的子账号密钥，不要把密钥写入 GitHub 或 `index.html`。
 
 配置完成后，Netlify 上的页面会自动读取 COS，向目录上传或删除素材不需要再次修改网页代码。
 
