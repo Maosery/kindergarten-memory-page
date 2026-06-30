@@ -1696,6 +1696,7 @@
 
     let dailyPool = [];
     let todayMemory = null;
+    const temporaryFeaturedMemoryId = "幼儿园时光/小班/2023年9月4日-入园第一天/";
     const today = new Date();
     const dayNumber = Math.floor(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) / 86400000);
     const todayText = new Intl.DateTimeFormat("zh-CN", {
@@ -1709,7 +1710,7 @@
       if (window.location.protocol === "file:") return fallbackMemories;
 
       try {
-        const response = await fetch("/api/memories", {
+        const response = await fetch("/api/memories?schema=event-albums-v1", {
           headers: { Accept: "application/json" }
         });
         if (!response.ok) throw new Error(`Media API returned ${response.status}`);
@@ -1739,7 +1740,9 @@
       }
 
       const todayIndex = ((dayNumber % dailyPool.length) + dailyPool.length) % dailyPool.length;
-      todayMemory = dailyPool[todayIndex];
+      todayMemory =
+        dailyPool.find((memory) => memory.id === temporaryFeaturedMemoryId) ||
+        dailyPool[todayIndex];
       renderDailyMemory(todayMemory);
     }
 
