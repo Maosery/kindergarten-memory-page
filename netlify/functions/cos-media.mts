@@ -140,21 +140,28 @@ function jsonResponse(data: unknown, status = 200) {
   });
 }
 
+function cleanMemoryTitle(rawTitle?: string) {
+  const title = rawTitle?.replace(/_/g, " ").trim() || "";
+  return /^\d+$/.test(title) ? "" : title;
+}
+
 export function metadataFromKey(key: string, stripExtension = true) {
   const fileName = key.split("/").pop() || key;
   const baseName = (stripExtension ? fileName.replace(/\.[^.]+$/, "") : fileName).trim();
   const fullDate = baseName.match(
-    /^(\d{4})[-_.年](\d{1,2})[-_.月](\d{1,2})(?:日)?[-_\s]+(.+)$/
+    /^(\d{4})[-_.年](\d{1,2})[-_.月](\d{1,2})(?:日)?(?:[-_\s]+(.+))?$/
   );
-  const compactDate = baseName.match(/^(\d{4})(\d{2})(\d{2})[-_\s]+(.+)$/);
-  const monthDay = baseName.match(/^(\d{1,2})[-_.月](\d{1,2})(?:日)?[-_\s]+(.+)$/);
-  const compactMonthDay = baseName.match(/^(\d{2})(\d{2})[-_\s]+(.+)$/);
+  const compactDate = baseName.match(/^(\d{4})(\d{2})(\d{2})(?:[-_\s]+(.+))?$/);
+  const monthDay = baseName.match(
+    /^(\d{1,2})[-_.月](\d{1,2})(?:日)?(?:[-_\s]+(.+))?$/
+  );
+  const compactMonthDay = baseName.match(/^(\d{2})(\d{2})(?:[-_\s]+(.+))?$/);
   const match = fullDate || compactDate;
 
   if (match) {
     const [, year, month, day, rawTitle] = match;
     return {
-      title: rawTitle.replace(/_/g, " ").trim(),
+      title: cleanMemoryTitle(rawTitle),
       date: `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
       dateLabel: `${Number(year)}年${Number(month)}月${Number(day)}日`
     };
@@ -164,7 +171,7 @@ export function metadataFromKey(key: string, stripExtension = true) {
   if (shortDate) {
     const [, month, day, rawTitle] = shortDate;
     return {
-      title: rawTitle.replace(/_/g, " ").trim(),
+      title: cleanMemoryTitle(rawTitle),
       date: `${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
       dateLabel: `${Number(month)}月${Number(day)}日`
     };
@@ -239,9 +246,12 @@ export function memoriesFromObjects(objects: CosObject[], directory: DirectoryCo
     };
 
     if (segments.length === 1) {
+      const metadata = metadataFromKey(key);
       memories.push({
         ...item,
-        ...metadataFromKey(key),
+        ...metadata,
+        title: metadata.title || `${directory.grade}日常`,
+        usesFallbackTitle: !metadata.title,
         grade: directory.grade,
         time: directory.time
       });
@@ -270,10 +280,12 @@ export function memoriesFromObjects(objects: CosObject[], directory: DirectoryCo
       ""
     );
 
+    const metadata = metadataFromKey(album.folderName, false);
     memories.push({
       id: album.id,
       kind: "album",
-      ...metadataFromKey(album.folderName, false),
+      ...metadata,
+      title: metadata.title || `${directory.grade}日常`,
       grade: directory.grade,
       time: directory.time,
       itemCount: album.items.length,
@@ -284,7 +296,26 @@ export function memoriesFromObjects(objects: CosObject[], directory: DirectoryCo
     });
   }
 
-  return memories;
+  const fallbackMemoriesByDate = new Map<string, typeof memories>();
+  for (const memory of memories) {
+    if (!memory.usesFallbackTitle || !memory.date) continue;
+    const matches = fallbackMemoriesByDate.get(memory.date) || [];
+    matches.push(memory);
+    fallbackMemoriesByDate.set(memory.date, matches);
+  }
+
+  for (const matches of fallbackMemoriesByDate.values()) {
+    if (matches.length < 2) continue;
+    matches
+      .sort((left, right) =>
+        left.id.localeCompare(right.id, "zh-CN", { numeric: true, sensitivity: "base" })
+      )
+      .forEach((memory, index) => {
+        memory.title = `${directory.grade}日常 · 片段 ${index + 1}`;
+      });
+  }
+
+  return memories.map(({ usesFallbackTitle: _usesFallbackTitle, ...memory }) => memory);
 }
 
 export default async (request: Request, _context: Context) => {
