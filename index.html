@@ -952,7 +952,7 @@
     .modal-media {
       display: block;
       width: 100%;
-      max-height: 86svh;
+      max-height: 82svh;
       border-radius: var(--radius);
       object-fit: contain;
       background: #111;
@@ -964,6 +964,26 @@
       color: rgba(255, 255, 255, 0.82);
       text-align: center;
       font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .memory-postmark {
+      margin-top: 5px;
+      color: #f4cf70;
+      font-family: var(--font-display);
+      font-size: 16px;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity 420ms ease, transform 420ms ease;
+    }
+
+    .memory-postmark[hidden] {
+      display: none;
+    }
+
+    .memory-postmark.is-visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .bottom-nav {
@@ -1412,13 +1432,13 @@
     </header>
 
     <main class="only-main">
-      <section class="daily-memory" aria-label="今日回忆">
+      <section class="daily-memory" id="dailyMemory" aria-label="今日回忆">
         <header class="today-header">
           <div>
             <div class="memory-date" id="dailyDate">今日回忆</div>
-            <h1>今日回忆</h1>
+            <h1 id="dailyTitle">今日回忆</h1>
           </div>
-          <p>三年时光，每天重逢一刻。</p>
+          <p id="dailySubtitle">三年时光，每天重逢一刻。</p>
         </header>
         <div class="memory-stage" id="dailyPage" aria-live="polite">
           <div class="daily-loading">
@@ -1437,7 +1457,10 @@
   <div class="modal" id="mediaModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="媒体预览" tabindex="-1">
     <div class="modal-inner">
       <div id="modalSlot"></div>
-      <div class="modal-caption" id="modalCaption"></div>
+      <div class="modal-caption">
+        <div id="modalCaption"></div>
+        <div class="memory-postmark" id="memoryPostmark" aria-live="polite" hidden></div>
+      </div>
     </div>
   </div>
 
@@ -1525,7 +1548,11 @@
     const modal = document.querySelector("#mediaModal");
     const modalSlot = document.querySelector("#modalSlot");
     const modalCaption = document.querySelector("#modalCaption");
+    const memoryPostmark = document.querySelector("#memoryPostmark");
+    const dailyMemory = document.querySelector("#dailyMemory");
     const dailyDate = document.querySelector("#dailyDate");
+    const dailyTitle = document.querySelector("#dailyTitle");
+    const dailySubtitle = document.querySelector("#dailySubtitle");
     const dailyPage = document.querySelector("#dailyPage");
 
     document.querySelector("#childNameTop").textContent = album.bookTitle;
@@ -1808,6 +1835,66 @@
     }).format(today);
     dailyDate.textContent = todayText;
 
+    function memoryDateParts(value) {
+      if (typeof value !== "string") return null;
+      const fullDate = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const shortDate = value.match(/^(\d{2})-(\d{2})$/);
+      const match = fullDate || shortDate;
+      if (!match) return null;
+
+      const year = fullDate ? Number(match[1]) : null;
+      const month = Number(fullDate ? match[2] : match[1]);
+      const day = Number(fullDate ? match[3] : match[2]);
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+      return { year, month, day };
+    }
+
+    function isAnniversaryMemory(memory) {
+      const parts = memoryDateParts(memory.date);
+      if (!parts || parts.month !== today.getMonth() + 1 || parts.day !== today.getDate()) {
+        return false;
+      }
+      return parts.year === null || parts.year < today.getFullYear();
+    }
+
+    function updateDailyHeader(memory) {
+      const isAnniversary = isAnniversaryMemory(memory);
+      dailyTitle.textContent = isAnniversary ? "那年的今天" : "今日回忆";
+      dailySubtitle.textContent = isAnniversary
+        ? "同一个日子，和那时的你重逢。"
+        : "三年时光，每天重逢一刻。";
+      dailyMemory.setAttribute("aria-label", isAnniversary ? "那年的今天" : "今日回忆");
+    }
+
+    function timePostmarkText(value) {
+      const parts = memoryDateParts(value);
+      if (!parts) return "这一幕，被好好珍藏了下来。";
+      if (parts.year === null) {
+        return `这一幕，留在了${parts.month}月${parts.day}日。`;
+      }
+
+      const memoryDay = Date.UTC(parts.year, parts.month - 1, parts.day);
+      const currentDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+      const elapsedDays = Math.floor((currentDay - memoryDay) / 86400000);
+      if (elapsedDays < 0) return `这一幕，留在了${parts.year}年${parts.month}月${parts.day}日。`;
+      if (elapsedDays === 0) return "这一幕，就发生在今天。";
+      return `这一幕，已经是 ${elapsedDays} 天前了。`;
+    }
+
+    function resetMemoryPostmark() {
+      memoryPostmark.classList.remove("is-visible");
+      memoryPostmark.hidden = true;
+      memoryPostmark.textContent = "";
+    }
+
+    function showMemoryPostmark(memoryDate) {
+      memoryPostmark.textContent = timePostmarkText(memoryDate);
+      memoryPostmark.hidden = false;
+      window.requestAnimationFrame(() => {
+        memoryPostmark.classList.add("is-visible");
+      });
+    }
+
     async function loadMemories() {
       if (window.location.protocol === "file:") return fallbackMemories;
 
@@ -1841,8 +1928,10 @@
         return;
       }
 
-      const todayIndex = ((dayNumber % dailyPool.length) + dailyPool.length) % dailyPool.length;
-      todayMemory = dailyPool[todayIndex];
+      const anniversaryPool = dailyPool.filter(isAnniversaryMemory);
+      const selectionPool = anniversaryPool.length ? anniversaryPool : dailyPool;
+      const todayIndex = ((dayNumber % selectionPool.length) + selectionPool.length) % selectionPool.length;
+      todayMemory = selectionPool[todayIndex];
       renderDailyMemory(todayMemory);
     }
 
@@ -1879,6 +1968,7 @@
             data-kind="${item.kind}"
             data-src="${item.src}"
             data-caption="${caption}"
+            data-memory-date="${memory.date || ""}"
             aria-label="${item.kind === "video" ? "播放" : "查看"}${memory.title}第${itemIndex + 1}个片段"
           `
           : `aria-hidden="true"`;
@@ -2047,6 +2137,8 @@
     }
 
     function renderDailyMemory(memory, triedIds = new Set()) {
+      updateDailyHeader(memory);
+
       if (memory.kind === "album") {
         renderAlbumMemory(memory);
         return;
@@ -2067,6 +2159,7 @@
             data-kind="${memory.kind}"
             data-src="${memory.src}"
             data-caption="${caption}"
+            data-memory-date="${memory.date || ""}"
             aria-label="${memory.kind === "video" ? "播放" : "查看"}${memory.title}"
           >
             ${media}
@@ -2101,17 +2194,22 @@
       const kind = mediaButton.dataset.kind;
       const src = mediaButton.dataset.src;
       const caption = mediaButton.dataset.caption;
+      const memoryDate = mediaButton.dataset.memoryDate;
       modalSlot.innerHTML = "";
       modalCaption.textContent = caption;
+      resetMemoryPostmark();
 
       if (kind === "photo") {
         const image = document.createElement("img");
         image.className = "modal-media";
-        image.src = src;
         image.alt = caption;
+        image.addEventListener("load", () => {
+          showMemoryPostmark(memoryDate);
+        }, { once: true });
         image.addEventListener("error", () => {
           image.src = fallbackImage;
         }, { once: true });
+        image.src = src;
         modalSlot.appendChild(image);
       } else {
         const video = document.createElement("video");
@@ -2120,6 +2218,9 @@
         video.controls = true;
         video.playsInline = true;
         video.preload = "metadata";
+        video.addEventListener("ended", () => {
+          showMemoryPostmark(memoryDate);
+        }, { once: true });
         video.addEventListener("error", () => {
           modalCaption.textContent = `${caption} · 素材待放入`;
         }, { once: true });
@@ -2135,6 +2236,7 @@
       modal.setAttribute("aria-hidden", "true");
       modalSlot.querySelectorAll("video").forEach((video) => video.pause());
       modalSlot.innerHTML = "";
+      resetMemoryPostmark();
     }
 
     modal.addEventListener("click", (event) => {
